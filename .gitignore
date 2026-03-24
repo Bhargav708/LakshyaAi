@@ -1,13 +1,15 @@
-# Python
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
-# Virtual Environment
+# Virtual environments
 venv/
 env/
+.venv/
 
-# Environment variables
+# Environment variables (IMPORTANT)
 .env
 
 # OS files
@@ -16,3 +18,35 @@ Thumbs.db
 
 # Temp files
 temp_*
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+*.log
+
+# Database
+*.sqlite3
+
+# Jupyter
+.ipynb_checkpoints
+
+# Testing / coverage
+.coverage
+.pytest_cache/
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+
+# Type checking
+.mypy_cache/
+.pyre/
+.ruff_cache/
+
+# Misc
+*.swp
