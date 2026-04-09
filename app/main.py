@@ -15,7 +15,7 @@ origins = [
     "http://127.0.0.1:8080",
     "http://localhost:5173",
     "https://lakshya-ai.netlify.app",
-]
+    "https://lakshya-ai.netlify.app/"]
 
 # Add CORS middleware BEFORE routers
 app.add_middleware(
