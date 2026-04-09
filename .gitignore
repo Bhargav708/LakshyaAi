@@ -9,6 +9,8 @@ venv/
 env/
 .venv/
 
+#uploads
+uploads/
 
 # Environment variables (IMPORTANT)
 .env
