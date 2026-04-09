@@ -4,7 +4,7 @@ def generate_quiz(topic: str):
     llm = get_llm()
 
     prompt = f"""
-    Generate 5 multiple choice questions (MCQs) on the topic: {topic}
+    Generate 10 multiple choice questions (MCQs) on the topic: {topic}
 
     Format:
     Q1. Question

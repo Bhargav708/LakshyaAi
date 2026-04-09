@@ -1,72 +1,82 @@
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import CharacterTextSplitter 
+from langchain_text_splitters import CharacterTextSplitter
 from app.agents.llm import get_llm
 
 # 🔥 Load embedding model
 embedding = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-# 🔥 Global vector store
-vector_store = None
+# 🔥 Store multiple users' vector DBs (IMPORTANT)
+vector_stores = {}
 
 # 🔥 LLM
 llm = get_llm()
 
 
 # =========================================================
-# ✅ LOAD PDF → CREATE VECTOR DB
+# ✅ LOAD PDF → CREATE VECTOR DB (PER USER)
 # =========================================================
-def load_pdf(path: str):
-    global vector_store
-
+def load_pdf(user_id: str, path: str):
     loader = PyPDFLoader(path)
     documents = loader.load()
 
-    # 🔥 IMPORTANT: split into chunks
     splitter = CharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50
+        chunk_size=1000,
+        chunk_overlap=200
     )
 
     docs = splitter.split_documents(documents)
 
-    vector_store = FAISS.from_documents(docs, embedding)
+    # Store vector DB per user
+    vector_stores[user_id] = FAISS.from_documents(docs, embedding)
 
-    print("✅ PDF loaded and indexed")
+    print(f"✅ PDF loaded for user: {user_id}")
 
 
 # =========================================================
 # ✅ GET CONTEXT FROM VECTOR DB
 # =========================================================
-def get_rag_context(question: str):
-    global vector_store
+def get_rag_context(user_id: str, question: str):
+    vector_store = vector_stores.get(user_id)
 
     if vector_store is None:
         return None
 
-    docs = vector_store.similarity_search(question, k=3)
+    docs = vector_store.similarity_search(
+        question,
+        k=10   # 🔥 increase from 5 → 10
+    )
 
-    context = "\n".join([doc.page_content for doc in docs])
+    context = "\n\n".join([doc.page_content for doc in docs])
 
     return context
-
-
 # =========================================================
-# ✅ FULL RAG ANSWER (OPTIONAL USE)
+# ✅ MAIN FUNCTION: ASK QUESTION FROM PDF
 # =========================================================
-def rag_answer(question: str):
-    context = get_rag_context(question)
+def ask_pdf(user_id: str, question: str):
+    context = get_rag_context(user_id, question)
 
     if not context:
-        return None
+        return "⚠️ No document found. Please upload a PDF first."
 
     prompt = f"""
-    Answer the question based only on the context below:
+You are an AI assistant.
 
-    {context}
+Use the context to answer the question.
 
-    Question: {question}
-    """
+If the question is general (like summary, overview),
+provide a summary based on available context.
 
-    return llm.invoke(prompt).content
+DO NOT say "Not found" unless context is completely empty.
+
+Context:
+{context}
+
+Question:
+{question}
+"""
+
+    response = llm.invoke(prompt)
+
+    return response.content
