@@ -12,8 +12,9 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Lakshya AI")
 origins = [
-    "http://localhost:8080",  # your frontend
+    "http://localhost:8080", 
     "http://127.0.0.1:8080",
+    "https://lakshya-ai.netlify.app"
 ]
 
 
