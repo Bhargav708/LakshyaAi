@@ -16,4 +16,4 @@ python-jose[cryptography]
 passlib[bcrypt]
 pypdf2
 python-docx
-exceptions
+
